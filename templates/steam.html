@@ -1,0 +1,512 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="h3 mb-1 text-gray-800" id="Information">基本信息</h1>
+<p class="mb-4">此模块包含了在该账户公开范围内的一些信息以及系统收录到的稍早一些的信息</p>
+<div class="row">
+    <div class="col-xl-6 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">个人信息</h6>
+            </div>
+            <div class="card-body">
+                <p>TA的ID:<code id="hisid">{{data.id}}</code></p>
+                <p>TA的steamid:{{data.steamid}}</p>
+                {% if data.images != [] %}
+                <p>TA的图片墙:</p>
+                {% for item in data.images %}
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;<a
+                        href="https://steamcommunity.com/sharedfiles/filedetails/?id={{item}}">{{item}}</a></p>
+                {% endfor %}
+                {% endif %}
+                {% if data.regestertime != "" %}
+                <p>TA的注册时间:{{data.regestertime}}</p>
+                {% endif %}
+                {% if gamedata|length > 0 or groupdata|length > 0 %}
+                <p>TA的游戏/群聊列表:</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>GameName/Groupid</th>
+                                <th>Appid/Groupnum</th>
+                                <th>OffialPage</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in gamedata %}
+                            <tr>
+                                <td>{{item["m.name"]}}</td>
+                                <td>{{item['m.id']}}</td>
+                                <td><a href="https://store.steampowered.com/app/{{item['m.id']}}">商店链接</a></td>
+                                <td>Game</td>
+                            </tr>
+                            {% endfor %}
+                            {% for item in groupdata %}
+                            <tr>
+                                <td>{{item["m.id"]}}</td>
+                                <td>{{item['m.num']}}</td>
+                                <td><a href="https://store.steampowered.com/app/{{item['m.id']}}">群组链接</a></td>
+                                <td>Group</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                <p>数据更新时间:{{data.updatetime|ctime}}</p>
+                <p>想要获取最新数据？请点击下方按钮将此账户加入优先队列，在系统完成当前任务后自动更新数据😀</p>
+                <form id="butto" class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-flag"></i>
+                    </span>
+                    <span class="text">点击将节点加入优先队列</span>
+                </form>
+                </br>
+                </br>
+                <div class="card mb-4 py-3 border-left-success" id="onsuccess" style="display: none;">
+                    <div class="card-body">
+                        加入优先队列成功！请耐心排队等待😁
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $("#butto").click(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/add',
+                    data: { 'data': $("#hisid").text() },
+                    success: function (data) {
+                        $("#onsuccess").show()
+                    },
+                    error: function (event) {
+                        console.log(event.responseText);
+                    },
+                    dataType: 'json'
+                });
+            })
+        </script>
+    </div>
+    <div class="col-xl-6 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">曾经使用过的信息</h6>
+            </div>
+            <div class="card-body">
+                {% if data.oldname|length > 0 %}
+                <p>曾经使用过的昵称:</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>ChangeTime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for it,em in data.oldname %}
+                            <tr>
+                                <td>{{it}}</td>
+                                <td>{{ em|ctime }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                {% if data.loc|length > 0 %}
+                <p>曾经更新过的地区:</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Location</th>
+                                <th>ChangeTime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for it,em in data.loc %}
+                            <tr>
+                                <td>{{it}}</td>
+                                <td>{{ em|ctime }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                {% if data.personaname|length > 0 %}
+                <p>曾经更新过的真名:</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>ChangeTime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for it,em in data.personaname %}
+                            <tr>
+                                <td>{{it}}</td>
+                                <td>{{ em|ctime }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                {% if data.summary|length > 0 %}
+                <p>曾经更新过的签名栏:</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Summary</th>
+                                <th>ChangeTime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for it,em in data.summary %}
+                            <tr>
+                                <td>{{it}}</td>
+                                <td>{{ em|ctime }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<h1 class="h3 mb-1 text-gray-800" id="Deduce">个人画像</h1>
+<p class="mb-4">此模块根据用户所玩游戏种类数目和时间综合而来</p>
+<div class="row">
+    <div class="col-xl-7 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">个人画像</h6>
+            </div>
+            <div class="card-body" style="min-height: 350px;">
+                <div id="cyt" style="min-height: 350px;width: 100%;height: 600%;text-align:center;
+                display:table;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">个人画像说明</h6>
+            </div>
+            <div class="card-body" style="min-height: 350px;">
+                <p>因为插件的显示原因，手机端的个人画像可能有点丑。如果需要查看正常显示的图片可以在手机浏览器中设置网页版(电脑版)UA。如果个人画像无法显示，有可能是该用户游戏做了隐藏或者没有游戏或者总游戏时长为0，当然也有可能是爬取该账户时出了一些问题。你在排除客观因素之后，可以选择手动点击加入优先节点并等待刷新完成再查看、也可以反馈信息至issue板块，感谢你做出的贡献😉
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<h1 class="h3 mb-1 text-gray-800" id="Intimacy">亲密关系</h1>
+<p class="mb-4">此模块根据用户和其好友的交互计算亲密度，仅具有参考意义</p>
+<div class="row">
+    <div class="col-xl-7 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">亲密度</h6>
+            </div>
+            <div class="card-body">
+                {% if intimacy|length > 0 %}
+                <p><strong>亲密度排序(前10位)</strong></p>
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>FriendId</th>
+                                <th>Intimacy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for it,em in intimacy %}
+                            <tr>
+                                <td>{{ it }}</td>
+                                <td>{{ em }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">亲密度说明</h6>
+            </div>
+            <div class="card-body" style="min-height: 350px;">
+                <p>亲密度的计算是基于两人之间的互动，拥有更多的相同游戏和群组、游戏品味越相似、互评越多分值越高喔！仅供参考😋<s>图一乐不要当真影响友情</s>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<h1 class="h3 mb-1 text-gray-800" id="NetWork">社交网络</h1>
+<p class="mb-4">此模块绘制出当前账户的社交网络图，可以拖动查看哦</p>
+<div class="row">
+    <div class="col-xl-12 col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">社交关系图</h6>
+            </div>
+            <div class="card-body" style="min-height: 600px;">
+                <div id="nwcot" style="min-height: 600px">
+                </div>
+            </div>
+            <script>
+                var nodes = [
+                    {% for k in person %}
+                {
+                    id: "{{ k }}",
+                        label: "{{ k }}",
+                            group: "Person"
+                },
+                {% endfor %}
+                ];
+                var edges = [
+                    {% for m in relation %}
+                {
+                    from: "{{m['p1.id']}}",
+                        to: "{{m['p2.id']}}",
+                            label: "{{m['type(label)']}}",
+                                arrows: ""
+                },
+                {% endfor %}
+                ]
+
+                // create a network
+                var container = document.querySelector('#nwcot');
+
+                var data = {
+                    nodes: nodes,
+                    edges: edges
+                };
+                var options = {
+                    height: '600px',
+                    width: '100%',
+                    // mass: 3,
+                    nodes: {
+                        shape: 'dot',
+                        size: 30,
+                        font: {
+                            size: 15,
+                            color: '#00ff00'
+                        },
+                        borderWidth: 2
+                    },
+                    edges: {
+                        width: 2
+                    },
+                    groups: {
+                        "Person": {
+                            color: {
+                                background: 'orange',
+                                border: 'maroon'
+                            },
+                            shadow: {
+                                enabled: true,
+                                color: 'rgba(0,0,0,0.5)',
+                                x: 2,
+                                y: 2
+                            }
+
+
+                        }
+                    }
+                };
+                network = new vis.Network(container, data, options);
+            </script>
+        </div>
+    </div>
+</div>
+<h1 class="h3 mb-1 text-gray-800" id="Likelyknow">可能认识的人</h1>
+<p class="mb-4">此模块给出了该账户可能认识的人，这些人都是不在该账户好友列表中的</p>
+<div class="row">
+    <div class="col-xl-12 col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">人际推荐</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Likelyknow</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for it,em in pbknow %}
+                            <tr>
+                                <td>{{ em }}</td>
+                                {% if it %}
+                                <td><a href="https://steamcommunity.com/profiles/{{em}}/">主页地址</a></td>
+                                {% else %}
+                                <td><a href="https://steamcommunity.com/id/{{em}}/">主页地址</a></td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<h1 class="h3 mb-1 text-gray-800" id="Withothers">人际对比</h1>
+<p class="mb-4">输入其他人id可以获得本账户和其他人账户之间可能存在的好友链条关系</p>
+<div class="row">
+    <div class="col-xl-12 col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">n度网络</h6>
+            </div>
+            <div class="card-body">
+                <p>输入其他人id查询彼此互动</p>
+                <form class="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 mw-100 search">
+                    <div class="input-group">
+                        <input type="text" id="sear" class="form-control bg-light border-0 small"
+                            placeholder="Search for interaction" aria-label="Search" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" id="sbtn">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="mtb" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>friendchain</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+                <script>
+                    $("#sbtn").click(function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/check',
+                            data: {
+                                'my': $("#hisid").text(),
+                                'his': $("#sear").val().toString()
+                            },
+                            success: function (data) {
+                                $("#mtb tbody").empty("");
+                                if (data['msg']==1){
+                                    $("#mtb tbody").append('<div class="card mb-4 py-3 .border-left-warning" id="onsu">'+
+                    '<div class="card-body">' + data['data'] + '</div>')
+                                }
+                                else{
+                                    for(var i=0;i<data['data'].length;i++){
+                                        if(data['data'][i][1] == 0){
+                                            var ur = "https://steamcommunity.com/profiles/"+data['data'][i][0]+"/"
+                                        }
+                                        else{
+                                            var ur = "https://steamcommunity.com/id/"+data['data'][i][0]+"/"
+                                        }
+                                        $("#mtb tbody").append('<tr><td>'+ data['data'][i][0] +'</td>'+
+                                            '<td><a href='+ur+'>主页地址</a></td></tr>')
+                                    }
+                                }
+                            },
+                            error: function (event) {
+                                console.log(1)
+                                console.log(event.responseText);
+                            },
+                            dataType: 'json'
+                        });
+                    })
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script crossorigin="anonymous"
+    integrity="sha512-UN8wX5Zf4Af6/2UJOYTYyWLHdua4SWMd1pnIxNoDCtqdaAMk1TQdvwwgoG7ShvuOS1d9jCerLNzwfvRmL7N4iA=="
+    src="https://lib.baomitu.com/echarts/5.2.0/echarts.min.js"></script>
+<script src="{{url_for('static', filename='js/echarts-wordcloud.min.js')}}"></script>
+<script>
+    var mycharts = echarts.init(document.getElementById("cyt"));
+    var namelist = {{ draftkey| safe}}
+    var jsonlist = {{ draftvalue | safe}};
+    var finalist = []
+    for (i = 0; i < jsonlist.length; i++) {
+        finalist.push({
+            "name": namelist[i],
+            "value": jsonlist[i]
+        })
+    }
+    image1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAQmklEQVR4Xu2dCdSuUxXHf7hkjIWEXC6ZQ4ZcM5kryTzUJVaIjJEQZVjIlHnWMs9uIssURciUeapUkqEoSgmZrtv6f8693m94v+993+d53+fZ++y91re+y/c+5+z93+f/nuecs8/eUxBSJwSmAxYBFk0/i6XfCwFvAS8DTwGnAXfVSXGvukzh1bCa2/XJBhI0kmFeoFWfPAIcA1xZc1tNq9eqM0wbWZHyUwELDJgJRAbNCrOUqNNDwEHAz0tsM5pKCARByhkKGvDbAssBeh2aB/gUIJL0Sm4AdgFe7FWHOfQTBCnu5Z2B44CZijdVuIU3gYOBk4APCrcWDbT8vhtQDUZgBuBIYK8agqPXrnHA0zXUzZRKMYMMdtf8aZ0wBlgQWByYFngV+DGwbPr/GwBabNdV3gUOSQv5iXVVsu565U4Q2b8GsDawWlpDzFh3p7Wp3+3AV4G/t/lcfLyNLUVvYI0C9kivR/N5M24Ie14B9gEuycDWUk3McQYZmwaKdptyEx0ungzcDGhBHzICArkRZBvgXGCazEfGe8DDwNvA9MAygGbVRtEa5hngT+nnNuAmYEJO2OVEEL2HX5rxa2UZ41qhLucAZ6awlzLarHUbuRBksxSS0cuDu1o7vqByigvbDzi9YDu1fzwHgnwBuL7Hp9q1d3xJCp4P7AC43Ub2ThBt2eo9eo6SBkQ0MxiBH6ZYMJfYeCfIWYBCQUK6h4BCWlYG7u9eF9W17JkgOvi7szpos+pZofcK1HT3quWZIHLa0lkN02qN3RIYX60K5ffulSDrAreUD1e0OAwCtwLreUPIK0G0a6VgwpDeIaDXK92IdHUfxSNBRgPPxYFg75jR0NO+wPGV9NylTj0S5HuAth5Deo/A1cDmve+2ez16JMjjwJLdgyxaHgaB5wFX0dHeCLJw3KKrnMA6nHUTKeyNILrz4OoduPLh3r4COjS8t/3H6vmEN4JcC2xUT6iz0UpXChQ17UK8EeRvwFwuPGPXiAOBo+yq319zTwSZLSVW8OIbq3YoBH53q8oP1NsTQVaNfLW1GJaXpZRDtVCmqBKeCLIFcFVRQOL5wgjc6CmKwRNBFNau8PaQahHQDpZ2slyIJ4Ic4GlxaHh0PQEsZVj/fqp7IojCSxRmElItAtpJVOJuF+KJIMr3tKcLr9g24p2UqtW2FUl7TwRROpqdXHjFvhFuwk08EeRiQKe4IdUjoIBFBS6aF08EUSkyXfsMqR4BRVM/Wb0axTXwRJCIwyo+HspqwU3AoieCqATZl8rycLRTCAEl63NRM9ETQZSkQckaQqpHYBNAM7p58UQQZR9f07xHfBjwNeByD6Z4IsgdwOoenOLABuXrPc+BHa6KeP4aWMWDUxzYsBtwhgM7XBHkbk9BcsYHl+6DuCiN4OkV6x5gJeMDy4v6Ko19igdjPBFEYdYrenCKAxuUPONEB3a4esUKgtRnRLrJsBgzSH0GlSdN9gZO8mCQJ4LEGqQ+IzLWIPXxxWRN4hykPk6JXaz6+GKyJrcDn6+hXjmqtGOqR2/edk+vWCrgso55j/gwYByg9D/mxRNBbgIURRpSPQKbAtdUr0ZxDTwR5Dpgw+KQRAslILAWoFde8+KJIHGjsD7D8bOA6rSYF08EuRD4unmP+DBAaX+U/se8eCLImcAu5j1i34BI+1NTHyq84bia6paTWg8Dy3kx2NMMsoeXCFLjg+sSYFvjNkxW3xNBLgC28+IYw3ZEfZAaOk9T+n3AqBrqlptKDwFjgQ88GG55BtHdD+23fzFdtbVsi4ex1GiDUv7oC+tZ4CeWq95aHVT7A0d7G1VO7Xk1RThoZjEnFgmyQiozbFF3cwOkJIX/DcwP6LcpsTjILvK0S2JqtBRT9lSL5SmsEUT6vgbMXMxX8XQFCLwJzA68XUHfHXdpjSDLADqICrGJwEaAgkrNiDWCKKXlpWbQDUUHInAk8H1LsFgjiGoQqhZhiE0Ebk7b8ma0t0YQxVop5irEJgJ/ABaxpLo1gpwNfNMSwKFrPwQmAFMDE63gYo0g5wPbWwE39BwSAe1Avm4FG2sEiTMQKyOruZ6mCnxaI0hE7NonyBLAU1bMsEYQ1Zz4lhVwQ88hEdBZ1qNWsLFGkNjFsjKymuupUPgHrJhhjSAHAUdYATf0HBKB5YEHrWBjjSA7A2dZATf0HBKBJYEnrWBjjSDK2He1FXBDzyERWBB4xgo21giiIp0q1hliF4G5gJetqG+NIGPSNU4r+IaegxH4GPCuFWCsEURJGd5K4QpWMA49P0JAd0JmtASINYII298Ci1kCOXSdjIC5pHIWCaJFuhbrIfYQOAw41JLaFgnyI+A7lkAOXfsQeB+YF3jJEh4WCaJoXkX1hthCQFVvVf3WlFgkyNzAi+CqxrupQdOBsqrdouvS5rItWiSI/KOrm+t34Kh4pPcIKLPi1oAuS5kTqwTRtU3F85jaMjQ3Ooop/B9gH+C8Ys1U+7RVggg1lXzWt9Ns1UIYvQ+BwK8AVbo1X2XKMkHkl3lSueHVYpjWAoEXgAO8lIAWotYJMskGRfkeC8xUi2GSnxLKlng4cIK1zIkjucoDQSbZOEvaKdkBWHYkw+PvpSGg+vTKNKOdRXfiiSCNzlGKy2vdeat+Br0HfALQgtyleCWInPXnlHLfpeNqYtR4YMua6NIVNTwTZD/gmK6gFo1OQmBt4DbPcHgmiM5ItKuitUlI+QiYi8ztBALPBBEeihw9pBNg4pkREdgkh3Wed4JMBzwNjB7R3fGBdhB4DFi6nQesftY7QeSXjYFrrDqopnpvCFxfU91KVSsHgggwRZO63m0pdVQM39jtqfx2D7usrqtcCDIr8EdAv0M6R0An5p9JW+idt2LoyVwIIpesA6jA/ZSG/FM3VZXZMqsKXzkRRIMtzkY6p9zvgKXS1dnOWzH2ZG4EkXuuALYy5qeq1VUeK8W3mSlbUBZgORJEict0X2HFskDMoJ1dgTMzsHOQiTkSRCDodF0pTLXgDBkeASXI+EauIOVKEPlbNxHvARbO1fkt2K0vEd3cNHmfvAX7RvxIzgQROMqQop0tlQUL6Y+AIhBWBv6VMzC5E0S+nxY4N122ynksNNquIE+t0czfKS/q0CDIhwjqbOR0YJeigDp4XiWaVwB+78CWwiYEQfpDqLgtzSa5nri/kQ5U7y88spw0EAQZ7EitS1TmTQF5OYmK2igZ3+M5GT2SrUGQ5gjtBSifbA7yRMp+qNISIQ0IBEGaD4c5rWUi73BkKwBR+cX+2eHzrh8LgjR37wyA3sm9i2YPxViFDIFAEKT5sJgqk8C8rO53tPstEAQZHrF3gGnaBdXY51Wxa3NjOvdM3SBIc6h1NqL386l75o1qOtLZz9nVdF3/XoMgw/tI4d2L19+NHWuogjazA6913ILzB4Mgwzv4YmAbx2PgUWAZx/YVNi0IMjyEBwOqzOpVzgGUGT+kCQJBkOGHxh7AKY5Hj74AVLYgJAjS0Rj4NnBiR0/aeCgW6CP4KWaQ4QE6PtXZszHc29cy26u0rUIVBBkeKd2oW6VVMA1+TtnvVTItJF6x2h4DH0+36XSi7lX0BRD1HYfxbswgzcFRkrQjvDIj2TUxFRl6zrmdHZsXBBkaOpUVeyaToqDxmhUzSFtfIAoxUTb4r7T1lN0Pv5WSVjxr14TuaR4zSH9std64EBjXPchr2bIymCwP/LeW2lWoVBDkI/BVbEeVcder0B9Vdv0IsG5cnOrvgiDIh3ioApVqiKxU5QitQd/Pp4JDIksIkDtBpk8HgdqxUn6sEFDt86PSDp7+nbXkShARQ0F6B6Zw76wHQRPjVXBo/9zL1+VEENmqheimKUHczMGKlhBQXRCF/V8GZHde4p0gsm/VdKdDZYt1vhHSOQKqja4t8BsBrVN00OhaPBFEtqicgX4WTT+Ko4oS0N0Zwq8AtwC3AUr84PIcxSpBRgGLpHQ1uhH3OWAsoFQ9IdUgoCzwOk/RjxLQKZ2QsjSaToBthSCaFdYClkuk0H97zzZSzTAvv9dXE1H0SnZfmm3MJKmrK0HmAzZIxVtUwCXWDuUP3Kpa1LpFyTBUBk+vZqrP8mZVyozUb50IovQ6in/aMSVRrpNuI+EYf+8cAaVWugm4CrgOUGxYbaQOg1B5YXX3W3XwlIImJF8ERJafpmvOD9YBhioJovJeuvOtcwnPl5Lq4GeLOmi9onwAIsz7VRlQBUFUvejkVMWoKrujXzsI6ER/vxRI2nOte0mQ+YGjgS17bmV06AGBu4HdASW765n0giDajv1B+haIrdmeudZlR0qVemwaTz157eo2QVQp9SJgIZfuCqOqQkBnKlsBev3qqnSLILq2qgWWdqe61UdXgYnGa4+Adrx0JHBpNzXtxuBVuhwFtOnkOyQQ6DYC+iL+LjChGx2VTZAFgZuBT3dD2WgzEGiCwC8BRWuXfqe+TIIsCfwCmCPcGAhUgICCI9cB/lFm32URRId+mjlmKlO5aCsQaBOBvySSKKdZKVIGQRRhq8CzGUvRKBoJBIoh8ELKp6zfhaUoQRYD7gXi+mphV0QDJSKgmWR1oDBJihBkznTtUr9DAoG6IaC79DqHe72IYp0SREnWFEwWBeiLoB/PdhuBO4C1i2wBd0qQK9JJZrcNjPYDgaIInArs2WkjnRBkJ0DFH0MCASsIbAz8rBNl2yWIaoY/FFkIO4E6nqkQAR0gKrlH29u/7RBEqTmVF0k7VyGBgDUEHkuJA9tKp9oOQc6KmtrWxkToOwCBM4Dd2kGlVYIo8FDxLiGBgHUEtKulZHctSSsEUTI2pWlRKp6QQMA6Ai+m44nXWjGkFYJcAGzXSmPxmUDACAK6vrsmH5Z6GFZGIsgWKV/RSO3E3wMBawgocYiy6nRMEOW+VW6iCEIcCcX4u1UEtk6VxZrq32wGUQiJ0kLOatXy0DsQaAGBd1NdxjubfXYogogUunwydwsdxEcCAesIaLGuKxtDlm8YiiDnA9tbtzr0DwTaQECLdhVaGiQDCaJTcm3pjrR4b6Pv+GggYAKBLwM3DNR0IBEUhKhgxJBAIDcEdCtWW7/9pJEgynqo9zFVgA0JBHJEQIlHnmw0vJEg66aaczkCEzYHAkLgGOCAZgQ5Dtg3cAoEMkbg+YEhVY0zyG9SOHDG+ITpgUBflWQVIe2TSQRRQKIulcTuVYyQ3BFQOLzC4vsRRInftBccEgjkjsD4xho2k2aMXYHTc0cm7A8EUi6teQfOIKe1e9MqoAwEHCOgwrJ/bVyDKOm0blqFBAKBAGyWiodOXpRre2t0IBMIBAJ9CBwOHDxpBhnVys2qAC4QyAgBxWQpNqtvBlmgk3xBGYEVpuaHgJJe9y3URZA1UvmC/GAIiwOB5gio1s0bIoiuHV4eSAUCgUA/BMYCD4ggewMnBDiBQCDQD4FxwGUiyJHAgQFOIBAI9EPgUOAwESRSisbICAQGI3AJsK0IcmVj7EkgFQgEAn0I3KUybiKIqtOuH6AEAoFAPwQUajKPCKIoXkXzhgQCgcBHCEwEphJBlANriUAmEAgEBiEwWgRRwqwxAU4gEAgMQmBFEeQlIEo5x+gIBAYjsLEIolQ/swQ6gUAgMAiBXUWQ/0VRzhgagcCQCBwqgqiIiELeQwKBQKA/AmeIIBOAKQOZQCAQGITAeBFE+70hgUAgMBiBW/8PLAMCa7j6evUAAAAASUVORK5CYII="
+
+    var maskResource = new Image()
+    maskResource.src = image1;
+    var option = {
+        //设置标题，居中显示
+        title: {
+            text: 'E词云图',
+            left: 'center',
+        },
+        //数据可以点击
+        tooltip: {
+
+        },
+
+        series: [
+            {
+                maskImage: maskResource,
+                //词的类型
+                type: 'wordCloud',
+                //设置字符大小范围
+                sizeRange: [6, 78],
+                rotationRange: [-45, 90],
+                textStyle: {
+                    normal: {
+                        //生成随机的字体颜色
+                        color: function () {
+                            return 'rgb(' + [
+                                Math.round(Math.random() * 160),
+                                Math.round(Math.random() * 160),
+                                Math.round(Math.random() * 160)
+                            ].join(',') + ')';
+
+                        }
+                    }
+
+                },
+                //不要忘记调用数据
+                data: finalist
+
+            }
+        ]
+
+    };
+    //加载图像，将数据放在图像中
+    maskResource.onload = function () {
+        mycharts.setOption(option)
+        window.onresize = function () {
+            setTimeout("mycharts.resize()", 100);
+        }
+
+    };
+</script>
+{% endblock %}

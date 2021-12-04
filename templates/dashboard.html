@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+    function hashChange() {
+        alert("DashBoard页面没有指定steam账号不能查看信息哦，为您自动跳转主页");
+        location.href = "/"
+    }
+    if (('onhashchange' in window) && ((typeof document.documentMode === 'undefined') || document.documentMode == 8)) {
+        window.onhashchange = hashChange;
+    } else {
+        setInterval(function () {
+            var ischanged = isHashChanged();
+            if (ischanged) {
+                hashChange();
+            }
+        }, 150);
+    }
+</script>
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            所有收录账户</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{allppl}}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            收录游戏数</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{allgame}}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">收录组数
+                        </div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{allgroup}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Requests Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            收录关系总数</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{allrela}}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-comments fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-12 mb-4">
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">项目介绍</h6>
+        </div>
+        <div class="card-body">
+            <p><strong>写在前面：PurgeSteam、社交网络和其他</strong></p>
+            <p>PurgeSteam是一个专注于Steam平台上人与人之间关系的项目，正如它的名字一样，它希望能吹散自己的视野限制带来的迷雾，让你看到某个steam账号周围的关系网络是什么样子的，同时，你还可以了解到这个账号主人对游戏的品味和喜好，以便推送一些和你可能志同道合的朋友。这个项目是本人的数据库大作业，你可以自由的使用它，并且其代码将于数据库结课后开源。
+            </p>
+            <p class="mb-0">其实之前就有过研究社交网络的想法，当时想做全民K歌的社交关系网。因为我觉得只有如下几个要素齐全，才能算得上是一个和现实生活对应比较“强”的社交关系。</p>
+            <p class="mb-0">
+                &nbsp;&nbsp;&nbsp;&nbsp;1.<strong>其一是不能是兴趣社区</strong>。比如知乎、B站，绝大部分人在上面消遣时间，关注的都是自己感兴趣的话题下高人气答主的有关内容，于我而言，可能这些平台上关注的人占我线下认识的人比例不足1/10，这些对于我的想法来说不是好的社交平台。
+            </p>
+            <p class="mb-0">
+                &nbsp;&nbsp;&nbsp;&nbsp;2.<strong>其二是信息必须是完全公开的</strong>。信息不公开的例子很多，比如QQ空间，现在如果不登录或者即使登录了也经常看不全点赞列表、大部分人都关闭了自己的空间等等，这样是无法获得社交网络全貌的。
+            </p>
+            <p class="mb-0">
+                &nbsp;&nbsp;&nbsp;&nbsp;3.<strong>其三是区分率高</strong>。我可以通过一些很简单的办法来判断A/B是不是相互认识的人，同时能够达到很高的正确率。</p>
+            </br>
+            <p>于是我想了很久，觉得全民K歌是很合适的选择。因为唱歌这种比较私密的事情，除非唱的很好会有很多粉丝，别的大部分都是相互之间认识的人，另外要判断可以通过除了关注之外的互动(除去套路性的评论等)比较容易的获取。但是后来放弃了这个想法，因为全民K歌这几年收缩了产品范围，不论是网页端还是小程序都几乎获取不到有用信息了，所以只能作罢。
+            </p>
+            <p>后来在群里聊天的时候，意外发现许多人的steam平台好友大都是认识的人，当然想想也在情理之中。steam和全民k歌最大的不同可能就是在于steam的匿名性更强了，但我们描述关系网，并不需要知道赛博世界和真实世界的对应关系。这也是本项目最初的灵感来源。
+            </p>
+            <p><strong>关于开发者</strong></p>
+            <p>（欲言又止）<s>一个肥宅，没什么好说的</s></p>
+            <p>（止言又欲）还是得为这个项目说一下，这个项目从开始到最后完成大概花了十几天的时间，写的时候真的非常投入，总共的代码(不算前端)应该也有上千行了😱...确实没把这个项目当成一个普通的大作业。<s>顶着学习压力摸大鱼，这确实是我能做出来的事情。</s>如果在项目运行过程中出现了一些问题或者bug，认识我的人可以直接小窗我，不认识的人可以在对应的github仓库下提issue(有仓库的话会更新在后面)</p>
+            <p>这里是羽山若木，<s>一个行走在社恐与社牛之间，偶尔干正事，大部分时间不务正业的大三老狗</s></p>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">项目公告栏</h6>
+        </div>
+        <div class="card-body">
+            <p><strong>项目公告 2021-12-02</strong></p>
+            <p>摸出来了前端，在加紧做接口</p>
+            <p><strong>项目公告 2021-12-05</strong></p>
+            <p>debug结束，开始部署</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

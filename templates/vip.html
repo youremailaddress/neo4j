@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="h3 mb-1 text-gray-800">提示信息</h1>
+<p class="mb-4">此账户已被登记但是尚未展开，您可以等待其展开，也可以选择将其加入优先队列处理，这样节点会在比较短的时间内展开。</p>
+<form id="butto" class="btn btn-primary btn-icon-split">
+    <span class="icon text-white-50">
+        <i class="fas fa-flag"></i>
+    </span>
+    <span class="text">点击将节点加入优先队列</span>
+</form>
+</br>
+</br>
+<div class="card mb-4 py-3 border-left-success" id="onsuccess" style="display: none;">
+    <div class="card-body">
+        加入优先队列成功！请耐心排队等待😁
+    </div>
+</div>
+<script>
+    $("#butto").click(function(){
+        console.log(1)
+        $.ajax({
+        type: 'POST',
+        url: '/add',
+        data: { 'data': location.href.split("/").pop().split("#")[0] },
+        success: function (data) {
+            $("#onsuccess").show()
+        },
+        error: function (event) {
+            console.log(event.responseText);
+        },
+        dataType: 'json'
+    });
+    })
+</script>
+{% endblock %}
