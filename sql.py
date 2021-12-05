@@ -32,7 +32,7 @@ class SQL:
                 continue
 
     def getconnect(self):
-        graph = Graph('http://localhost:7474', auth=("database","password"))
+        graph = Graph('neo4j+s://af477b24.databases.neo4j.io', auth=("database","password"))
         match = NodeMatcher(graph)
         rmatch = RelationshipMatcher(graph)
         return graph,match,rmatch
